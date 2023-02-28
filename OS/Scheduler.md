@@ -3,8 +3,11 @@
 - Job Queue : 현재 시스템 내에 있는 모든 프로세스의 집합
 - Ready Queue : 현재 메모리 내에 있으면서 CPU의 할당을 기다리는 프로세스의 집합
 - Device Queue : Device I/) 작업을 대기하고 있는 프로세스의 집합
+
+</br>
+
 ## 장기 스케줄러(Long-term scheduler or job scheduler)
-많은 프로세스들이 한꺼번에 메모리에 올라올 경우, 대용량 메모리(디스크)에 임시 저장된다.
+많은 프로세스들이 한꺼번에 메모리에 올라올 경우, 대용량 메모리(디스크)에 임시 저장된다.  
 이 pool에 저장되어 있는 프로세스 중 어떤 프로세스에 메모리를 할당하여 Ready Queue로 보낼지 결정한다.
 - `메모리`와 `디스크` 사이의 스케줄링
 - 프로세스에 메모리(+ 각종 리소스)를 할당
@@ -21,10 +24,15 @@
 - degree of Multiprogramming(실행중인 프로세스 수) 제어
 - 프로세스의 상태 : `ready` &rarr; `suspended`
 
+</br>
+
 ----
 
 # CPU 스케줄러
 Ready Queue에 있는 프로세스들이 CPU의 할당을 받을 기준.
+
+</br>
+
 ## FCFS(First Come First Served)
 #### 특징
   - 먼저 온 프로세스 순서대로 처리한다.
@@ -76,3 +84,9 @@ Ready Queue에 있는 프로세스들이 CPU의 할당을 받을 기준.
 #### 주의점
   - 설정한 할당 시간(time quantum)이 너무 크면 FCFS와 같아진다.
   - 할당 시간이 너무 작으면 이상적이지만 잦은 문맥 교환으로 오버헤드가 발생한다.
+
+</br>
+
+---- 
+#### 출처  
+https://github.com/JaeYeopHan/Interview_Question_for_Beginner
