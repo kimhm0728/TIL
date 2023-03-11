@@ -23,14 +23,14 @@
   CPU를 반납하고 해당 장치 큐에 들어감  
 - `blocked` &rarr; `ready`   
   I/O 작업을 위해 장치 큐에 있던 프로세스가 작업을 수행하고, 다시 Ready Queue에 들어감  
-- `running &rarr; `terminated`   
+- `running` &rarr; `terminated`   
   프로세스 실행이 완료되어 자원을 반납  
 - `blocked, ready` &rarr; `suspended blocked, suspended ready`  
   blocked, ready 상태에 있던 프로세스들이 어떠한 요인(ex: 메모리 부족)에 의해 suspended된 상태    
   이 프로세스들은 메모리를 조금도 보유하지 않고 통째로 디스크로 swap-out 됨  
 </br>
 
----- 
+----  
 #### 출처  
 https://github.com/JaeYeopHan/Interview_Question_for_Beginner  
 https://jhnyang.tistory.com/7  
