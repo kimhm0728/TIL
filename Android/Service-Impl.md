@@ -25,7 +25,6 @@
 - 서비스를 시작한 구성 요소와 독립적인 수명 주기를 가진다.
 	- 서비스는 백그라운드에서 무한히 실행될 수 있다.
 	- 서비스를 시작한 구성 요소의 소멸 여부와 서비스의 중단은 무관하다.
-	- 서비스는 `stopSelf()`를 통해 스스로 중단하거나 다른 구성 요소가 `stopService()`를 호출하여 중단시킬 수 있다.
 
 - 다른 구성 요소가 서비스를 시작하려면, `startService()`를 호출할 때 `Intent`를 인자로 전달한다.
 	- 인텐트에 서비스를 지정하고 서비스가 사용할 데이터를 담는다.
@@ -43,11 +42,11 @@
 ## `IntentService` 클래스
 - 여러개의 요청을 동시에 처리하지 않아도 되는 서비스를 구현할 때 적합하다.
 - 작동 방식
-	- `onStartCommand()`에 전달된 모든 인텐트를 실행하는 기본 worker 스레드를 새엉한다.
-	- 인텐트를 한 번에 하나씩 `onHandleIntent()`에 전달하는 작업 큐를 생성한다. (다중 스레딩에 대한 문제 x)
+	- `onStartCommand()`에 전달된 모든 인텐트를 실행하는 기본 worker 스레드를 생성한다.
+	- 인텐트를 한 번에 하나씩 `onHandleIntent()`에 전달하는 작업 큐를 생성한다.
 	- `onStartCommand()`에서 인텐트를 작업 큐로 보내고 `onHandleIntent()`를 호출한다.
 	- 요청이 모두 처리된 후 서비스를 중단하기 때문에 `stopSelf()`를 호출하지 않아도 된다.
-	- `onBind()`이 `null`을 반환하도록 해준다
+	- `onBind()`이 `null`을 반환한다.
 	
 ```kotlin 
 // 슈퍼 클래스의 생성자로 worker 스레드의 이름을 전달
@@ -57,12 +56,12 @@ class HelloIntentService : IntentService("HelloIntentService") {
 		try {
 			Thread.sleep(5000)
 		} catch (e: InterruptedException) {
-		Thread.currentThread().interrupt()
+			Thread.currentThread().interrupt()
 		}
 	}  
 }
 ```
-- 생성자의 인자를 전달하고 `onHandleIntent()`만 구현하면 된다.
+- 생성자의 인자를 전달하고 `onHandleIntent()`만 필수적으로 구현하면 된다.
 
 
 ```kotlin
@@ -72,7 +71,7 @@ override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 }
 ```
 - 다른 콜백 함수(`onCreate()`, `onStartCommand()` 등)을 override하려면 꼭 슈퍼 클래스의 함수를 호출해야 한다. 그래야 `IntentService`가 worker 스레드의 수명을 적절히 관리할 수 있다.
-- `onBind()`는 예외적으로 슈퍼 클래스의 함수를 호출하지 않아도 된다. 서비스가 바인드를 허용하는 경우 구현한다.
+- `onBind()`는 예외적으로 슈퍼 클래스의 함수를 호출하지 않아도 된다. 
 
 ## Service 클래스
 - 서비스가 작업 큐로 요청을 하나씩 처리하는 것이 아닌, 멀티스레딩을 수행해야 하는 경우 적합하다.
@@ -151,7 +150,6 @@ class HelloService : Service() {
 		- 즉시 재개되어야 하는 작업을 수행할 때 적합하다.
 ## 서비스 시작
 - 구성 요소에서 서비스를 시작하려면 `Intent`에 시작할 서비스를 지정하여 `startService()`나 `startForegroundService()`에 전달한다.
-- 시스템이 `Intent`와 함께 서비스의 `onStartCommand()`를 호출한다.
 - *API 26 이상인 경우 앱이 포그라운드에 있지 않을 때 백그라운드 서비스를 사용/생성하는 것을 제한한다. `startForegroundCommand()`를 호출하면, 백그라운드 서비스를 생성하지만 서비스가 자체적으로 포그라운드로 승격된다. 서비스 생성 후 5초 이내에 `startForeground()`를 호출해야 한다.*
 
 ```kotlin
@@ -174,8 +172,7 @@ Intent(this, HelloService::class.java).also { intent ->
 ## 서비스 중단
 - 서비스는 자신의 수명 주기를 직접 관리한다.
 - `stopSelf()`를 통해 스스로 중단하거나 다른 구성 요소가 `stopService()`를 호출하여 중단시킬 수 있다.
--  `stopSelf()`, `stopService()`를 호출하면 시스템은 가능한 한 빨리 서비스를 소멸시킨다.
-- 서비스가 여러 요청을 동시에 처리하는 경우, 요청을 끝낸 후에도 서비스를 중단하지 않는다. 서비스 중단 후 새로운 요청을 받을 수 있기 때문이다.
+- 서비스가 여러 요청을 동시에 처리하는 경우, 요청을 끝낸 후에도 서비스를 중단하지 않아야 한다. 서비스 중단 후 새로운 요청을 받을 수 있기 때문이다.
 	- 이를 해결하기 위해 `stopSelf(int)`를 사용한다. 인자로 `onStartCommand()`의 `startId`를 전달한다. `startId`에 맞는 요청만을 중단하기 때문에, 서비스가 새 요청을 수신하면 `startId`가 일치하지 않아 중단되지 않는다.
 - _리소스 낭비, 배터리 소모를 줄이기 위해 서비스가 시작되면 항상 명시적으로 서비스를 중단해야 한다._
 
@@ -183,12 +180,88 @@ Intent(this, HelloService::class.java).also { intent ->
 ## bound 서비스 생성
 - `bindService()`를 호출하여 다른 구성 요소를 서비스에 바인딩한다.
 - 다른 구성 요소가 서비스와 상호작용이 필요한 경우 적합하다.
-- `onBind()` 콜백 함수를 override하여 서비스와 통신하기 위한 `IBinder`를 반환해야 한다.
-- 그 후 다른 구성 요소가 `bindService()`를 호출하면, 구성 요소는 `IBinger`에 접근하여 서비스의 함수를 호출할 수 있다.
+- 클라이언트가 서비스와 통신할 방법을 나타내는 `IBinder` 인터페이스를 구현해야 한다. 이를 `onBind()`에서 반환한다.
+-  그 후 다른 구성 요소가 `bindService()`를 호출하면, 구성 요소는 `IBinger`에 접근하여 서비스의 함수를 호출할 수 있다.
 
 - 시스템은 서비스와 바인딩된 구성 요소가 없으면 소멸시킨다. `stopSelf()`, `stopService()`를 통해 명시적으로 중단하지 않아도 된다.
-- 클라이언트가 서비스와 통신할 방법을 나타내는 `IBinder` 인터페이스를 구현해야 한다. 이를 `onBind()`에서 반환한다.
-- 클라이언트는 `IBinder`를 수신하여 서비스와 상호작용한다.
-
 - 여러 클라이언트가 하나의 서비스에 바인딩될 수 있다.
 - 클라이언트가 서비스와의 상호작용을 완료하면 `unbindService()`를 호출하여 바인딩을 해제한다.
+- https://developer.android.com/guide/components/bound-services?hl=ko
+
+## 포그라운드 서비스
+- 사용자가 포그라운드 서비스를 인식하고 있기 때문에 메모리가 부족하더라도 시스템은 중단하지 않는다.
+- `Notification`로 서비스에 대한 알림을 제공해야 하며, 서비스를 중단하거나 포그라운드에서 제거하지 않는 이상 제거할 수 없다.
+- ex) 음악을 재생하는 음악 플레이어
+
+- `Notification`의 우선 순위를 `PRIORITY_LOW` 이상이어야 한다. 사용자가 애플리케이션의 서비스를 확실히 인식해야 하기 때문이다.
+- _API 28 이상에서는 포그라운드 서비스를 사용할 때 `FOREGROUND_SERVICE` 권한을 요청해야 한다.
+
+```kotlin
+val pendingIntent: PendingIntent =
+	Intent(this, ExampleActivity::class.java).let { notificationIntent ->
+	PendingIntent.getActivity(this, 0, notificationIntent, 0)
+	}  
+  
+val notification: Notification = Notification.Builder(this, CHANNEL_DEFAULT_IMPORTANCE)
+	.setContentTitle(getText(R.string.notification_title))
+	.setContentText(getText(R.string.notification_message))
+	.setSmallIcon(R.drawable.icon)
+	.setContentIntent(pendingIntent)
+	.setTicker(getText(R.string.ticker_text))
+	.build()  
+  
+startForeground(ONGOING_NOTIFICATION_ID, notification)
+```
+- `startForegound()`
+	- 서비스가 포그라운드에서 실행되도록 한다.
+	- 인자로 알림을 고유하게 식별할 정수와 상태 표시줄에 띄울 `Notification`을 전달한다.
+
+- `stopForeground()`
+	- 서비스를 포그라운드에서 제거한다.
+	- 인자로 `Notification`의 알림 제거 여부를 나타내는 `Boolean` 값을 전달한다.
+
+## 서비스 수명 주기
+- started 서비스
+	- 시작: 다른 구성 요소가 `startService()` 호출
+	- 중단: 서비스가 `stopSelf()` 호출, 다른 구성 요소가 `stopService()` 호출
+- bound 서비스
+	- 시작: 다른 구성 요소(클라이언트)가 `bindService()`를 호출
+	- 연결 종료: 클라이언트가 `unbindService()`를 호출
+	- 소멸: 모든 클라이언트가 바인딩을 해제
+- started 서비스에도 다른 구성 요소를 바인딩할 수 있다. 이 경우 모든 클라이언트가 바인딩을 해제해야만 소멸되며, `stopService()`, `stopSelf()`를 호출해도 소멸되지 않는다.
+
+```kotlin
+class ExampleService : Service() {
+	private var startMode: Int = 0             // 서비스가 중단되었을 때 행동
+	private var binder: IBinder? = null        // 바인드하는 클라이언트와 상호작용할 인터페이스
+	private var allowRebind: Boolean = false   // onRebind() 사용 여부
+	
+	override fun onCreate() {
+		// 서비스 생성
+	}
+
+	override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+		// 서비스 시작
+		return _mStartMode_
+	}
+	
+	override fun onBind(intent: Intent): IBinder? {
+		// 클라이언트와 바인딩  
+		return _mBinder_
+	}
+
+	override fun onUnbind(intent: Intent): Boolean {
+		// 모든 클라이언트가 언바인드
+		return _mAllowRebind_
+	}
+
+	override fun onRebind(intent: Intent) {
+		// 언바인드 후 다시 바인딩
+	}
+	
+	override fun onDestroy() {
+		// 서비스가 더 이상 사용되지 않아 소멸
+	}  
+}
+```
+- 액티비티의 수명 주기 콜백과는 다르게, 슈퍼 클래스의 함수를 호출하지 않아도 된다.
