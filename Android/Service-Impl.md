@@ -14,22 +14,22 @@
 - `android:name` 속성을 필수적으로 지정해야 한다.
 - 서비스를 시작하는데 필요한 권한이나 서비스를 실행해야 하는 프로세스의 특성 등을 지정할 수 있다.
 - `android:exported` 속성을 `false`로 설정하면 자신의 애플리케이션 내에서만 서비스를 사용할 수 있다.
-
+<br></br>
 - *애플리케이션 보안을 위해, 서비스를 시작할 때는 항상 명시적 인텐트만 사용한다. 서비스에 대한 인텐트 필터를 선언하지 않는다.*
 - *사용자는 자신의 기기에서 서비스를 볼 수 있다. 사용자가 서비스를 중단하는 것을 막으려면 `android:description` 속성으로 서비스의 설명을 작성한다.*
 
 ## started 서비스 생성
 - 다른 구성 요소가 `startService()`를 호출하여 서비스를 시작한다.
 - 서비스의 `onStartCommand()`가 호출된다.
-
+<br></br>
 - 서비스를 시작한 구성 요소와 독립적인 수명 주기를 가진다.
 	- 서비스는 백그라운드에서 무한히 실행될 수 있다.
 	- 서비스를 시작한 구성 요소의 소멸 여부와 서비스의 중단은 무관하다.
-
+<br></br>
 - 다른 구성 요소가 서비스를 시작하려면, `startService()`를 호출할 때 `Intent`를 인자로 전달한다.
 	- 인텐트에 서비스를 지정하고 서비스가 사용할 데이터를 담는다.
 	- 서비스는 `onStartCommand()`의 매개변수로 이 인텐트를 받는다.
-
+<br></br>
 - start 서비스 생성을 위한 클래스
 	- `Service
 		- 모든 서비스의 상위 클래스
@@ -39,7 +39,7 @@
 		- worker 스레드를 사용하여 여러 요청을 하나씩 처리한다.
 		- `onHandleIntent()`를 override하여 시작 요청에 대해 인텐트를 수신하고, 백그라운드 작업을 완료하도록 한다.
 
-## `IntentService` 클래스
+## IntentService 클래스
 - 여러개의 요청을 동시에 처리하지 않아도 되는 서비스를 구현할 때 적합하다.
 - 작동 방식
 	- `onStartCommand()`에 전달된 모든 인텐트를 실행하는 기본 worker 스레드를 생성한다.
@@ -130,7 +130,7 @@ class HelloService : Service() {
 ```
 - `IntentService`와 동일하게 한번에 하나의 요청만 수행하는 코드를 `Service`로 구현한 것이다. 
 - `IntentService`와 다르게 구현해야 할 코드의 양이 많아진다.
-
+<br></br>
 - `onStartCommand()` 반환값
 	- 시스템이 서비스를 중단할 경우 서비스를 유지할지에 대한 값
 	- `START_NOT_STICKY`
@@ -158,14 +158,12 @@ Intent(this, HelloService::class.java).also { intent ->
 }
 ```
 - 서비스를 시작하기 위해서는 위 코드처럼 명시적 인텐트를 사용한다.
-
 - 서비스가 실행되고 있는 경우 `onStartCommmand()`를 즉시 호출한다.
 - 서비스가 실행되고 있지 않는 경우 `onCreate()`를 호출 후 `onStartCommand()`를 호출한다.
-
+<br></br>
 - 서비스를 시작한 구성 요소에게 결과를 반환해야 할 경우, `PendingIntent`를 사용한다.
 	- 서비스를 시작한 클라이언트가 브로드캐스트를 받기 위해 `getBroadcast()`를 사용해 `PendingIntent`를 만든다.
 	- 이를 서비스에 전달하고, 서비스는 이 브로드캐스트를 사용하여 결과를 전달한다.
-
 - 서비스를 여러번 시작하는 경우 `onStartCommand()`도 여러번 호출된다.
 - 하지만 서비스를 중단하기 위해서는 한 번만 중단하면 된다.
 
@@ -182,7 +180,7 @@ Intent(this, HelloService::class.java).also { intent ->
 - 다른 구성 요소가 서비스와 상호작용이 필요한 경우 적합하다.
 - 클라이언트가 서비스와 통신할 방법을 나타내는 `IBinder` 인터페이스를 구현해야 한다. 이를 `onBind()`에서 반환한다.
 -  그 후 다른 구성 요소가 `bindService()`를 호출하면, 구성 요소는 `IBinger`에 접근하여 서비스의 함수를 호출할 수 있다.
-
+<br></br>
 - 시스템은 서비스와 바인딩된 구성 요소가 없으면 소멸시킨다. `stopSelf()`, `stopService()`를 통해 명시적으로 중단하지 않아도 된다.
 - 여러 클라이언트가 하나의 서비스에 바인딩될 수 있다.
 - 클라이언트가 서비스와의 상호작용을 완료하면 `unbindService()`를 호출하여 바인딩을 해제한다.
@@ -192,7 +190,7 @@ Intent(this, HelloService::class.java).also { intent ->
 - 사용자가 포그라운드 서비스를 인식하고 있기 때문에 메모리가 부족하더라도 시스템은 중단하지 않는다.
 - `Notification`로 서비스에 대한 알림을 제공해야 하며, 서비스를 중단하거나 포그라운드에서 제거하지 않는 이상 제거할 수 없다.
 - ex) 음악을 재생하는 음악 플레이어
-
+<br></br>
 - `Notification`의 우선 순위를 `PRIORITY_LOW` 이상이어야 한다. 사용자가 애플리케이션의 서비스를 확실히 인식해야 하기 때문이다.
 - _API 28 이상에서는 포그라운드 서비스를 사용할 때 `FOREGROUND_SERVICE` 권한을 요청해야 한다.
 
@@ -221,6 +219,7 @@ startForeground(ONGOING_NOTIFICATION_ID, notification)
 	- 인자로 `Notification`의 알림 제거 여부를 나타내는 `Boolean` 값을 전달한다.
 
 ## 서비스 수명 주기
+![service_binding_tree_lifecycle](https://github.com/kimhm0728/TIL/assets/70271235/8c86749d-718d-454a-a0d4-37851a026c31)
 - started 서비스
 	- 시작: 다른 구성 요소가 `startService()` 호출
 	- 중단: 서비스가 `stopSelf()` 호출, 다른 구성 요소가 `stopService()` 호출
