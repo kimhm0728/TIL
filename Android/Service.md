@@ -63,7 +63,7 @@
 	- 다른 구성 요소에서 `startService()`를 호출한다.
 	- 서비스의 `onStartCommand()`콜백이 호출된다.
 	- 서비스가 `stopSelf()`로 스스로 중단하거나, 다른 구성 요소가 `stopService()`로 중단할 때까지 실행된다.
-- binding 서비스
+- bound 서비스
 	- 바인드
 	- 다른 구성 요소에서 `bindService()`를 호출한다.
 	- 서비스의 `onBind()` 콜백이 호출된다.
